@@ -1,10 +1,10 @@
 username
 password
-class 1 page link
-class 2 page link
-class 3 page link
-class 4 page link
-class 5 page link
-class 6 page link
-class 7 page link
-class 8 page link
+class 1 page url
+class 2 page url
+class 3 page url
+class 4 page url
+class 5 page url
+class 6 page url
+class 7 page url
+class 8 page url
