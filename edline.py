@@ -44,21 +44,22 @@ print("Logging in...")
 response = requests.get(LOGIN_URL, headers=HEADERS)
 if response.status_code != 200:
     print("Failed to access Edline")
+    quit()
 cookies = response.cookies
 response = requests.post(LOGIN_POST_URL, data=DATA, headers=HEADERS,
                          cookies=cookies, allow_redirects=False)
 location_url = response.headers["location"]
 if location_url == URL + "/Notification.page":
     print("Bad credentials")
+    quit()
 cookies.update(response.cookies)
 
 # Class list
 print("Retrieving grades...")
-print()
 
 class_grades = collections.OrderedDict()
 for page in pages:
-    report_url = page + "/Current_Assignments_Report/Kim__Noah"
+    report_url = page + "/Current_Assignments_Report"
     response = requests.get(report_url, headers=HEADERS, cookies=cookies)
     soup = bs4.BeautifulSoup(response.text)
     iframe = soup.findChild("iframe", {"id": "docViewBodyFrame"})
@@ -74,7 +75,8 @@ for page in pages:
             break
         lines.append(text.replace("\xa0", ""))
     class_grades[class_name] = lines
-
+     
+print()
 for class_grade in class_grades:
     lines = class_grades[class_grade]
     print("%-20s%-8s%s" % (class_grade.title(), lines[-2], lines[-1]))
@@ -84,6 +86,7 @@ for class_grade in class_grades:
     lines = class_grades[class_grade]
     print(class_grade.title())
     for i in range(0, len(lines) - 3, 5):
-        print("  %s (%s%%)\n    %-7s%s" % (lines[i], lines[i+1], lines[i+3],
-                                         lines[i+2]))
+        print(("  %s (%s%%)" % (lines[i], lines[i+1])).ljust(32) +
+              ("%-7s%s" % (lines[i+3], lines[i+2])))
+    print("%-32s%-8s%s" % ("  Total", lines[-2], lines[-1]))
     print()

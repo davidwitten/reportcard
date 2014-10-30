@@ -1,10 +1,10 @@
-<username>
-<password>
-<class 1 page link>
-<class 2 page link>
-<class 3 page link>
-<class 4 page link>
-<class 5 page link>
-<class 6 page link>
-<class 7 page link>
-<class 8 page link>
+username
+password
+class 1 page link
+class 2 page link
+class 3 page link
+class 4 page link
+class 5 page link
+class 6 page link
+class 7 page link
+class 8 page link
