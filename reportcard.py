@@ -5,6 +5,7 @@
 import tkinter
 import tkinter.ttk
 import tkinter.scrolledtext
+import tkinter.messagebox
 import re
 import requests
 import bs4
@@ -51,7 +52,7 @@ class Scraper:
         """Log in to Edline."""
         response = requests.get(LOGIN_URL, headers=self.headers)
         if response.status_code != 200:
-            print("Failed to access Edline!")
+            tkinter.messagebox.showerror("Failed to access Edline!")
             quit()
         self.cookies = response.cookies
         response = requests.post(LOGIN_POST_URL, data=self.data,
@@ -59,7 +60,7 @@ class Scraper:
                                  allow_redirects=False)
         location_url = response.headers["location"]
         if location_url == URL + "/Notification.page":
-            print("Bad credentials")
+            tkinter.messagebox.showerror("Bad credentials")
             quit()
         self.cookies.update(response.cookies)
 
@@ -146,20 +147,23 @@ class Viewer:
         self.sidebar_list.selection_set(0)
 
     def poll(self):
-        z = []
         """Update the current content."""
         if self.sidebar_list.curselection():
-            selection = int(self.sidebar_list.curselection()[0])#Which class is selected (summary is 0)
+            selection = int(self.sidebar_list.curselection()[0])
             if selection == 0:
+                gpa = []
                 display = ""
                 for report in self.scraper.reports:
-                    display += "%-20s%-8s%s\n" % ((report.course.title(),) + report.cumulative)
-                    z.append(['E','D','C','B','A'].index(report.cumulative[1]))
+                    display += "%-20s%-8s%s\n" % ((report.course.title(),) +
+                                                  report.cumulative)
+                    gpa.append(['E','D','C','B','A'].index(
+                        report.cumulative[1]))
                 self.content_text.config(state="normal")
                 self.content_text.delete("1.0", "end")
                 self.content_text.insert("1.0", display)
-                self.content_text.insert("9.0","-"*30+'\n')
-                self.content_text.insert("10.0","%-20s%-8s"%('GPA',str(sum(z)/len(z))))
+                self.content_text.insert("end", '\n')
+                self.content_text.insert("10.0","%-20s%-8s" %
+                                         ('GPA', str(sum(gpa) / len(gpa))))
                 self.content_text.config(state="disabled")
             else:
                 selection -= 1
@@ -177,7 +181,7 @@ class Viewer:
                 self.content_text.insert("1.0", display)
                 self.content_text.config(state="disabled")               
                     
-        self.window.after(100, self.poll)#updates every 10th of a second
+        self.window.after(100, self.poll)
 
     def build(self):
         """Build the interface."""
@@ -200,7 +204,7 @@ class Viewer:
         self.window.title("Report Card")
 
         self.sidebar = tkinter.Frame(self.window)
-        self.sidebar.pack(side="right", fill="y")
+        self.sidebar.pack(side="left", fill="y")
         self.sidebar_list = tkinter.Listbox(self.sidebar)
         self.sidebar_list.config(width=25, selectmode="single")
         self.sidebar_list.pack(side="left", fill="y")
