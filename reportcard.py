@@ -118,8 +118,7 @@ class Viewer:
         """Load the application."""        
         with open("edline.txt") as file:
             contents = file.read()
-            username, password, *pages = [line.strip() for line in
-                                          contents.split("\n")]
+            username, password, *pages = [line.strip() for line in contents.split("\n")]
         self.progressbar.step(10) # 10
         self.window.update()
 
@@ -139,7 +138,7 @@ class Viewer:
         self.window.quit()
 
     def setup(self):
-        """Set up for Edline data."""
+        """Set up for Edline data."""#List on side
         if self.sidebar_list.size() == 0:
             self.sidebar_list.insert("end", "Summary")
             for report in self.scraper.reports:
@@ -147,17 +146,20 @@ class Viewer:
         self.sidebar_list.selection_set(0)
 
     def poll(self):
+        z = []
         """Update the current content."""
         if self.sidebar_list.curselection():
-            selection = int(self.sidebar_list.curselection()[0])
+            selection = int(self.sidebar_list.curselection()[0])#Which class is selected (summary is 0)
             if selection == 0:
                 display = ""
                 for report in self.scraper.reports:
-                    display += "%-20s%-8s%s\n" % ((report.course.title(),) +
-                                                report.cumulative)
+                    display += "%-20s%-8s%s\n" % ((report.course.title(),) + report.cumulative)
+                    z.append(['E','D','C','B','A'].index(report.cumulative[1]))
                 self.content_text.config(state="normal")
                 self.content_text.delete("1.0", "end")
                 self.content_text.insert("1.0", display)
+                self.content_text.insert("9.0","-"*30+'\n')
+                self.content_text.insert("10.0","%-20s%-8s"%('GPA',str(sum(z)/len(z))))
                 self.content_text.config(state="disabled")
             else:
                 selection -= 1
@@ -175,7 +177,7 @@ class Viewer:
                 self.content_text.insert("1.0", display)
                 self.content_text.config(state="disabled")               
                     
-        self.window.after(100, self.poll)
+        self.window.after(100, self.poll)#updates every 10th of a second
 
     def build(self):
         """Build the interface."""
@@ -198,7 +200,7 @@ class Viewer:
         self.window.title("Report Card")
 
         self.sidebar = tkinter.Frame(self.window)
-        self.sidebar.pack(side="left", fill="y")
+        self.sidebar.pack(side="right", fill="y")
         self.sidebar_list = tkinter.Listbox(self.sidebar)
         self.sidebar_list.config(width=25, selectmode="single")
         self.sidebar_list.pack(side="left", fill="y")
